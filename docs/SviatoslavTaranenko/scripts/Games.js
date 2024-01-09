@@ -58,6 +58,18 @@ function createCardElement(game) {
     return clone;
 }
 
+async function fetchGamesData() {
+    const response = await fetch('https://mmo-games.p.rapidapi.com/games', {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': '1c3169c707mshb51bff34cbc9ff6p1749b9jsn648a19134256',
+            'X-RapidAPI-Host': 'mmo-games.p.rapidapi.com',
+        },
+    });
+    const gamesData = await response.json();
+    return gamesData.slice(0, 50);
+}
+
 function renderGames(games) {
     const cardContainer = document.querySelector('[data-type="card-container"]');
 
@@ -76,7 +88,19 @@ function renderGames(games) {
     });
 }
 
-renderGames();
+document.addEventListener('DOMContentLoaded', async () => {
+    const loadingOverlay = document.getElementById('loading-overlay');
+    loadingOverlay.style.display = 'flex';
+
+    try {
+        const gamesData = await fetchGamesData();
+        renderGames(gamesData);
+    } catch (error) {
+        console.error('Games loading error:', error);
+    } finally {
+        loadingOverlay.style.display = 'none';
+    }
+});
 
 function init() {
 }
